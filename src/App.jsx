@@ -45,14 +45,18 @@ function App() {
   const buildingCost = buildingArea * buildingCostPerMeterSquared;
 
   const totalCost = landCost + buildingCost;
-  const monthlyInstalment = totalCost / targetMonthDuration;
-  const duration = totalCost / targetMonthlyInstalment;
+  const monthlyInstalment = safeDivide(totalCost, targetMonthDuration);
+  const duration = safeDivide(totalCost, targetMonthlyInstalment);
 
   useEffect(() => {
     if (mode == ModeByTargetDuration) {
-      formik.setFieldValue('targetMonthDuration', Math.round(duration));
+      if (targetMonthlyInstalment != 0) {
+        formik.setFieldValue('targetMonthDuration', Math.round(duration));
+      }
     } else if (mode == ModeByTargetMonthlyInstalment) {
-      formik.setFieldValue('targetMonthlyInstalment', monthlyInstalment);
+      if (targetMonthDuration != 0) {
+        formik.setFieldValue('targetMonthlyInstalment', monthlyInstalment);
+      }
     }
   }, [mode]);
 
@@ -192,6 +196,14 @@ function App() {
       </Stack>
     </div>
   );
+}
+
+function safeDivide(a, b) {
+  if (b == 0) {
+    return a;
+  }
+
+  return a / b;
 }
 
 export default App;
